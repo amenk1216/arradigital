@@ -1,0 +1,437 @@
+/* ==========================================================================
+   ARRA DIGITAL - ADMIN PANEL STYLESHEET
+   Desain responsif, modern, selaras dengan design system Arra Digital
+   ========================================================================== */
+
+/* 1. LAYOUT UMUM ADMIN */
+.admin-body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2. LOGIN VIEW */
+.login-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 36px 28px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-header .brand-logo {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--line);
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--soft);
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.alert-box {
+  padding: 12px 14px;
+  border-radius: var(--radius-btn);
+  font-size: 0.88rem;
+  margin-bottom: 18px;
+  display: none;
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.alert-success {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.alert-info {
+  background-color: var(--soft);
+  color: var(--accent);
+  border: 1px solid var(--line);
+}
+
+/* 3. DASHBOARD TOP NAVIGATION */
+.admin-navbar {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.admin-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-badge-portal {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: var(--soft);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+
+.admin-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gas-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #9AA1B5;
+}
+
+.status-dot.active {
+  background-color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.status-dot.standalone {
+  background-color: #F59E0B;
+}
+
+/* 4. DASHBOARD TABS & CONTENT */
+.admin-content {
+  flex: 1;
+  padding: 32px 0 56px 0;
+}
+
+.admin-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* 5. OVERVIEW STATS CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.stat-box {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.stat-box-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.stat-box-val {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.stat-box-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* 6. DATA TABLES */
+.table-card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.table-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-header-bar h3 {
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  padding: 12px 18px;
+  background-color: var(--bg);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tr:hover td {
+  background-color: rgba(79, 70, 229, 0.04);
+}
+
+/* Status Badges */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pill-new {
+  background-color: rgba(79, 70, 229, 0.15);
+  color: var(--accent);
+}
+
+.pill-contacted {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+}
+
+.pill-done {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+}
+
+/* Action Buttons inside Table */
+.btn-sm {
+  padding: 6px 12px;
+  min-height: 32px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+/* 7. MODAL DIALOG */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.is-active {
+  display: flex;
+}
+
+.modal-box {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-header h3 {
+  font-size: 1.2rem;
+}
+
+.modal-close-btn {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  color: var(--text);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 8. RESPONSIVE */
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .admin-navbar {
+    height: auto;
+  }
+}
