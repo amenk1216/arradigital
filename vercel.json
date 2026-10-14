@@ -1,10 +1,8 @@
 {
-  "version": 2,
-  "name": "arra-digital",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/((?!assets/|css/|js/|admin.html|favicon.svg|.*\\..*).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
