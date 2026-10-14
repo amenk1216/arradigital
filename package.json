@@ -1,0 +1,26 @@
+{
+  "name": "arra-digital",
+  "version": "1.0.0",
+  "description": "Production MVP for ARRA DIGITAL (arradigital.my.id) - Digital Products, AI Tools & Automation Solutions",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test test/api.test.js"
+  },
+  "keywords": [
+    "digital-products",
+    "ai-tools",
+    "automation",
+    "google-apps-script",
+    "indonesia",
+    "mvp"
+  ],
+  "author": "ARRA DIGITAL",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
