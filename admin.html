@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Arra Digital</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- ========================================== -->
+  <!-- 1. LOGIN VIEW                              -->
+  <!-- ========================================== -->
+  <div id="view-login" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <a href="index.html" class="brand-logo">
+          Arra<span class="logo-accent">Digital</span>
+        </a>
+        <p>Masuk ke Panel Administrasi &amp; Database</p>
+      </div>
+
+      <div id="login-alert" class="alert-box alert-danger"></div>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label class="form-label" for="login-username">Username</label>
+          <input type="text" id="login-username" class="form-input" placeholder="Masukkan username" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Masukkan password" required autocomplete="current-password">
+          <p class="form-hint">Kredensial awal default: <strong>admin</strong> / <strong>admin123</strong></p>
+        </div>
+
+        <button type="submit" id="btn-submit-login" class="btn btn-primary btn-full" style="margin-top: 10px;">
+          Masuk ke Dashboard
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 0.88rem;">
+        <a href="index.html" style="color: var(--muted); text-decoration: underline;">&larr; Kembali ke Website Utama</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. DASHBOARD VIEW                          -->
+  <!-- ========================================== -->
+  <div id="view-dashboard" style="display: none; flex-direction: column; min-height: 100vh;">
+    <!-- Navbar Header -->
+    <header class="admin-navbar">
+      <div class="container admin-nav-inner">
+        <div class="admin-nav-left">
+          <a href="index.html" class="brand-logo" style="font-size: 1.25rem;">
+            Arra<span class="logo-accent">Digital</span>
+          </a>
+          <span class="admin-badge-portal">Admin Hub</span>
+        </div>
+
+        <div class="admin-nav-right">
+          <div id="gas-status-indicator" class="gas-status-pill" title="Status koneksi ke Google Spreadsheet">
+            <span class="status-dot standalone"></span>
+            <span id="gas-status-text">Mode Standalone</span>
+          </div>
+
+          <a href="index.html" target="_blank" class="btn btn-secondary btn-sm" aria-label="Lihat Website">
+            Lihat Web &nearr;
+          </a>
+          <button type="button" id="btn-logout" class="btn btn-secondary btn-sm" style="color: #EF4444; border-color: rgba(239,68,68,0.3);">
+            Keluar
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="admin-content">
+      <div class="container">
+
+        <!-- Navigation Tabs -->
+        <div class="admin-tabs-nav" role="tablist">
+          <button type="button" class="tab-btn active" data-tab="tab-overview">Ringkasan</button>
+          <button type="button" class="tab-btn" data-tab="tab-packages">Paket Harga</button>
+          <button type="button" class="tab-btn" data-tab="tab-products">Produk Digital</button>
+          <button type="button" class="tab-btn" data-tab="tab-inquiries">Log Konsultasi (Leads)</button>
+          <button type="button" class="tab-btn" data-tab="tab-settings">Pengaturan &amp; GAS</button>
+        </div>
+
+        <!-- Notification Banner -->
+        <div id="global-alert" class="alert-box alert-success" style="margin-bottom: 20px;"></div>
+
+        <!-- ---------------- TAB 1: OVERVIEW ---------------- -->
+        <div id="tab-overview" class="tab-pane active">
+          <!-- Metric Cards -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-box-title">Total Paket</div>
+              <div id="stat-total-packages" class="stat-box-val">0</div>
+              <div class="stat-box-sub">Tampil di halaman web</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-title">Produk Digital</div>
+              <div id="stat-total-products" class="stat-box-val">0</div>
+              <div class="stat-box-sub">Akses AI &amp; template</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-title">Konsultasi Masuk</div>
+              <div id="stat-total-inquiries" class="stat-box-val">0</div>
+              <div class="stat-box-sub">Tercatat di sistem</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-title">Database Spreadsheet</div>
+              <div id="stat-gas-status" class="stat-box-val" style="font-size: 1.3rem; margin-top: 6px;">Lokal</div>
+              <div class="stat-box-sub">Google Apps Script</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Bar -->
+          <div class="card" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <h3 style="margin-bottom: 4px;">Sinkronisasi Real-time</h3>
+              <p style="font-size: 0.9rem;">Ambil data paket dan konsultasi langsung dari Google Spreadsheet database Anda.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button type="button" id="btn-sync-gas" class="btn btn-primary btn-sm">
+                &circlearrowright; Sync Spreadsheet
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Inquiries Table Preview -->
+          <div class="table-card">
+            <div class="table-header-bar">
+              <h3>Konsultasi / Leads Terbaru</h3>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('tab-inquiries')">Lihat Semua</button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Tipe</th>
+                    <th>Nama / WA</th>
+                    <th>Detail</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-inquiries-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--muted);">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------------- TAB 2: PACKAGES ---------------- -->
+        <div id="tab-packages" class="tab-pane">
+          <div class="table-card">
+            <div class="table-header-bar">
+              <div>
+                <h3>Daftar Paket Harga</h3>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 2px;">Kelola harga, target, dan fitur paket yang tampil di website publik.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nama Paket</th>
+                    <th>Harga</th>
+                    <th>Target Sasaran</th>
+                    <th>Status Populer</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="packages-table-body">
+                  <!-- Dirender oleh admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------------- TAB 3: PRODUCTS ---------------- -->
+        <div id="tab-products" class="tab-pane">
+          <div class="table-card">
+            <div class="table-header-bar">
+              <div>
+                <h3>Katalog Produk Digital</h3>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 2px;">Kelola nama, ikon emoji, dan deskripsi produk digital.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ikon</th>
+                    <th>Nama Produk</th>
+                    <th>Deskripsi</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <!-- Dirender oleh admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------------- TAB 4: INQUIRIES ---------------- -->
+        <div id="tab-inquiries" class="tab-pane">
+          <div class="table-card">
+            <div class="table-header-bar">
+              <div>
+                <h3>Log Konsultasi &amp; Leads</h3>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 2px;">Riwayat pengunjung yang menekan tombol konsultasi atau paket via WhatsApp.</p>
+              </div>
+              <button type="button" id="btn-refresh-inquiries" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID / Tanggal</th>
+                    <th>Kategori</th>
+                    <th>Item Pilihan</th>
+                    <th>Nama &amp; WhatsApp</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiries-table-body">
+                  <!-- Dirender oleh admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------------- TAB 5: SETTINGS & GAS ---------------- -->
+        <div id="tab-settings" class="tab-pane">
+          <div class="card" style="margin-bottom: 24px;">
+            <h3 style="margin-bottom: 12px;">Integrasi Google Apps Script &amp; Spreadsheet</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 18px;">
+              Hubungkan aplikasi dengan Google Spreadsheet menggunakan Web App URL dari script di folder <code>gas/Code.gs</code>.
+            </p>
+
+            <form id="form-gas-url">
+              <div class="form-group">
+                <label class="form-label" for="gas-endpoint-url">Google Apps Script Web App URL</label>
+                <input type="url" id="gas-endpoint-url" class="form-input" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+                <p class="form-hint">Dapatkan URL ini setelah menerapkan (Deploy) Web app di Google Apps Script (Who has access: Anyone).</p>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">Uji &amp; Simpan Koneksi GAS</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 12px;">Pengaturan WhatsApp &amp; Informasi Bisnis</h3>
+            <form id="form-business-settings">
+              <div class="form-group">
+                <label class="form-label" for="setting-wa-number">Nomor WhatsApp Bisnis</label>
+                <input type="text" id="setting-wa-number" class="form-input" placeholder="6281317028494" required>
+                <p class="form-hint">Gunakan format internasional tanpa spasi atau tanda plus (contoh: 6281317028494).</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setting-wa-msg">Pesan WhatsApp Default</label>
+                <input type="text" id="setting-wa-msg" class="form-input" placeholder="Halo Arra Digital, saya ingin konsultasi." required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setting-brand-name">Nama Brand</label>
+                <input type="text" id="setting-brand-name" class="form-input" value="Arra Digital" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setting-brand-tagline">Tagline</label>
+                <input type="text" id="setting-brand-tagline" class="form-input" value="Studio Website &amp; Produk Digital" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-sm">Simpan Pengaturan Bisnis</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. MODALS                                  -->
+  <!-- ========================================== -->
+  <!-- Modal Edit Paket -->
+  <div id="modal-edit-package" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-pkg-title">Edit Paket Harga</h3>
+        <span class="modal-close-btn" onclick="closeModal('modal-edit-package')">&times;</span>
+      </div>
+      <form id="form-edit-package">
+        <div class="modal-body">
+          <input type="hidden" id="edit-pkg-id">
+          
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-name">Nama Paket</label>
+            <input type="text" id="edit-pkg-name" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-price">Harga (Rupiah murni angka)</label>
+            <input type="number" id="edit-pkg-price" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-prefix">Awalan Harga</label>
+            <input type="text" id="edit-pkg-prefix" class="form-input" placeholder="Kosongkan atau ketik 'Mulai '">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-target">Target Sasaran</label>
+            <textarea id="edit-pkg-target" class="form-textarea" rows="2" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-features">Fitur (1 fitur per baris)</label>
+            <textarea id="edit-pkg-features" class="form-textarea" rows="4" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-revisions">Kuota Revisi</label>
+            <input type="text" id="edit-pkg-revisions" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-support">Dukungan / Support</label>
+            <input type="text" id="edit-pkg-support" class="form-input" required>
+          </div>
+
+          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="edit-pkg-popular" style="width: 18px; height: 18px;">
+            <label for="edit-pkg-popular" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">Tandai sebagai Paket 'PALING LARIS'</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-package')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit Produk -->
+  <div id="modal-edit-product" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Produk Digital</h3>
+        <span class="modal-close-btn" onclick="closeModal('modal-edit-product')">&times;</span>
+      </div>
+      <form id="form-edit-product">
+        <div class="modal-body">
+          <input type="hidden" id="edit-prod-id">
+
+          <div class="form-group">
+            <label class="form-label" for="edit-prod-icon">Ikon Emoji</label>
+            <input type="text" id="edit-prod-icon" class="form-input" style="width: 80px;" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-prod-name">Nama Produk</label>
+            <input type="text" id="edit-prod-name" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-prod-desc">Deskripsi</label>
+            <textarea id="edit-prod-desc" class="form-textarea" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-product')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
