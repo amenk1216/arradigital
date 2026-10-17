@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48" fill="none">
+  <defs>
+    <linearGradient id="logoGradLight" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+    <linearGradient id="bgBoxLight" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EFF6FF" />
+      <stop offset="100%" stop-color="#DBEAFE" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#bgBoxLight)" stroke="#3B82F6" stroke-width="1.5" stroke-opacity="0.5" />
+  <path d="M24 10L35 34H28.5L26 28H22L19.5 34H13L24 10Z" fill="url(#logoGradLight)" />
+  <polygon points="24,17 21,24 27,24" fill="#EFF6FF" />
+  <circle cx="24" cy="20.5" r="1.5" fill="#2563EB" />
+
+  <text x="56" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#0F172A" letter-spacing="0.5">ARRA</text>
+  <text x="110" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#2563EB" letter-spacing="0.5">DIGITAL</text>
+  <text x="56" y="38" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="600" fill="#64748B" letter-spacing="1.2">AI &amp; DIGITAL SOLUTIONS</text>
+</svg>
