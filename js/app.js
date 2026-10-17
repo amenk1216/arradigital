@@ -435,65 +435,203 @@ async function renderProductDetailView(slug) {
 
     const isQuote = prod.price === 0;
     const isSample = prod.name.includes('Sampel Demo');
+    const waNumber = STATE.settings.public_whatsapp || '6281317028494';
+    const waInquiryText = `Halo Arra Digital, saya ingin menanyakan tentang produk *${prod.name}*. Boleh minta informasi lebih lanjut?`;
+    const waInquiryUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waInquiryText)}`;
 
-    const featuresList = (prod.features || []).map(f => `
-      <li style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.95rem;">
-        <span style="color: var(--accent-blue); font-weight: bold;">✓</span>
-        <span>${escapeHtml(f)}</span>
-      </li>
+    const featuresListHtml = (prod.features || []).map(f => `
+      <div class="feature-item-card">
+        <div class="feature-item-icon">✓</div>
+        <div>${escapeHtml(f)}</div>
+      </div>
     `).join('');
+
+    const descParagraphs = (prod.description || '')
+      .split(/\n\s*\n/)
+      .map(p => `<p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px;">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+      .join('');
+
+    const detailImgUrl = getProductThumbnailUrl(prod);
+    const mediaHtml = `
+      <div class="product-media-container">
+        <div class="product-media-preview-box" onclick="openImageZoom('${detailImgUrl}', '${escapeHtml(prod.name)}')" title="Klik untuk memperbesar gambar pratinjau dalam resolusi penuh">
+          <img src="${detailImgUrl}" alt="${escapeHtml(prod.name)}" class="product-media-main-img" id="product-main-image" onerror="this.onerror=null;this.src='/assets/products/website-starter-kit.jpg';" />
+          <div class="image-zoom-indicator">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            Klik untuk Memperbesar Gambar (Resolusi Penuh)
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <span style="font-size: 0.82rem; color: var(--text-muted);">📸 Pratinjau Desain Asli Produk</span>
+          <button type="button" class="btn btn-secondary btn-xs" onclick="openImageZoom('${detailImgUrl}', '${escapeHtml(prod.name)}')" style="font-size: 0.78rem; padding: 4px 10px;">
+            🔍 Perbesar Gambar
+          </button>
+        </div>
+
+        <div class="product-trust-chips" style="margin-top: 14px;">
+          <div class="trust-chip"><span class="trust-chip-icon">⚡</span> Akses Cepat &amp; Instan</div>
+          <div class="trust-chip"><span class="trust-chip-icon">🔒</span> 100% File Aman &amp; Teruji</div>
+          <div class="trust-chip"><span class="trust-chip-icon">💬</span> Konsultasi &amp; Panduan WA</div>
+          <div class="trust-chip"><span class="trust-chip-icon">🔄</span> Pembaruan Template Berkala</div>
+        </div>
+      </div>
+    `;
 
     app.innerHTML = `
       <section class="section">
-        <div class="container" style="max-width: 900px;">
-          <nav style="margin-bottom: 24px; font-size: 0.9rem; color: var(--text-muted);">
+        <div class="container" style="max-width: 1040px;">
+          <!-- Breadcrumbs -->
+          <nav style="margin-bottom: 24px; font-size: 0.88rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <a href="/" data-route="/" class="text-muted">Beranda</a> &rsaquo;
-            <a href="/produk" data-route="/produk" class="text-muted">Produk</a> &rsaquo;
-            <span class="text-blue">${escapeHtml(prod.name)}</span>
+            <a href="/produk" data-route="/produk" class="text-muted">Katalog Produk</a> &rsaquo;
+            <span class="badge-pill badge-purple" style="font-size: 0.75rem; padding: 2px 8px;">${escapeHtml(prod.category)}</span> &rsaquo;
+            <span class="text-blue" style="font-weight: 600;">${escapeHtml(prod.name)}</span>
           </nav>
 
-          <div class="card" style="padding: 36px;">
-            <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-              <span class="badge-pill badge-purple">${escapeHtml(prod.category)}</span>
-              ${isSample ? '<span class="badge-pill badge-sample">Sampel Demo Terverifikasi</span>' : ''}
-              <span class="badge-pill badge-blue">${prod.delivery_type === 'digital_download' ? 'Akses Digital Instan' : 'Layanan Konsultasi Kustom'}</span>
-            </div>
+          <!-- 2-Column Hero Showcase -->
+          <div class="product-detail-hero-grid">
+            <!-- Left: Visual Media -->
+            ${mediaHtml}
 
-            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 16px; line-height: 1.25;">
-              ${escapeHtml(prod.name)}
-            </h1>
-
-            <p style="font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
-              ${escapeHtml(prod.short_description || '')}
-            </p>
-
-            <div style="background-color: var(--bg-surface); padding: 20px 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
-              <div>
-                <span style="display: block; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Investasi Transparan</span>
-                <span style="font-size: 2rem; font-weight: 850; color: #FFFFFF;">${formatIDR(prod.price)}</span>
+            <!-- Right: Product Overview & Buy Box -->
+            <div class="product-info-panel">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <span class="badge-pill badge-purple">${escapeHtml(prod.category)}</span>
+                ${isSample ? '<span class="badge-pill badge-sample">Sampel Demo Terverifikasi</span>' : ''}
+                <span class="badge-pill badge-blue">${prod.delivery_type === 'digital_download' ? 'Akses Digital Instan' : 'Layanan Kustom Profesional'}</span>
               </div>
-              <div>
-                <button onclick="openOrderModal('${prod.id}', '${escapeHtml(prod.name)}', ${prod.price})" class="btn btn-primary btn-lg">
-                  ${isQuote ? 'Konsultasikan Layanan' : 'Pesan Sekarang'}
-                </button>
+
+              <h1 style="font-size: 2.1rem; font-weight: 850; line-height: 1.25; margin-top: 4px;">
+                ${escapeHtml(prod.name)}
+              </h1>
+
+              <p style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.6;">
+                ${escapeHtml(prod.short_description || '')}
+              </p>
+
+              <!-- Quick Specs -->
+              <div class="product-specs-box">
+                <div class="spec-item">
+                  <span class="spec-label">Format Distribusi</span>
+                  <span class="spec-value">${prod.delivery_type === 'digital_download' ? 'Cloud Drive &amp; File Digital' : 'Sesi Konsultasi &amp; Pengerjaan'}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Akses &amp; Lisensi</span>
+                  <span class="spec-value">Akses Seumur Hidup (Pribadi/Bisnis)</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Bahasa Panduan</span>
+                  <span class="spec-value">Bahasa Indonesia Lengkap</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Dukungan Pengguna</span>
+                  <span class="spec-value">Pendampingan via WhatsApp</span>
+                </div>
+              </div>
+
+              <!-- Pricing Card & Buy CTA -->
+              <div class="product-pricing-card">
+                <div class="pricing-card-top">
+                  <div>
+                    <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Investasi Transparan</span>
+                    <span class="pricing-amount-large">${formatIDR(prod.price)}</span>
+                  </div>
+                  <span class="badge-pill badge-blue" style="font-size: 0.8rem;">${isQuote ? 'Konsultasi Bebas Biaya' : 'Sekali Bayar &middot; Tanpa Langganan'}</span>
+                </div>
+
+                <div class="order-actions-group">
+                  <button onclick="openOrderModal('${prod.id}', '${escapeHtml(prod.name)}', ${prod.price})" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; font-size: 1.05rem; font-weight: 700;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    ${isQuote ? 'Konsultasikan Layanan Sekarang' : 'Pesan & Dapatkan Akses Sekarang'}
+                  </button>
+
+                  <a href="${waInquiryUrl}" target="_blank" rel="noopener" class="btn btn-secondary btn-md" style="width: 100%; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.34C9.36 7.34 9.09 7.4 8.87 7.65C8.64 7.89 8 8.49 8 9.72C8 10.95 8.89 12.13 9.01 12.3C9.14 12.46 10.77 14.97 13.25 16.05C13.84 16.31 14.3 16.46 14.66 16.58C15.26 16.77 15.8 16.74 16.24 16.68C16.73 16.6 17.74 16.06 17.95 15.47C18.16 14.88 18.16 14.38 18.1 14.28C18.03 14.17 17.86 14.11 17.61 13.98C17.36 13.86 16.14 13.26 15.91 13.18C15.69 13.09 15.52 13.05 15.36 13.3C15.19 13.55 14.71 14.11 14.56 14.28C14.41 14.45 14.27 14.47 14.02 14.34C13.77 14.22 12.97 13.96 12.02 13.11C11.28 12.45 10.78 11.63 10.63 11.38C10.49 11.13 10.61 11 10.74 10.87C10.85 10.76 10.99 10.58 11.12 10.43C11.24 10.29 11.28 10.18 11.37 10.01C11.45 9.85 11.41 9.7 11.35 9.58C11.28 9.45 10.78 8.23 10.58 7.73C10.37 7.24 10.17 7.31 10.01 7.31C9.87 7.31 9.7 7.34 9.53 7.34Z"/></svg>
+                    Tanya Admin via WhatsApp
+                  </a>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <span>🔒</span> Transaksi terhubung langsung ke WhatsApp Resmi Arra Digital
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Structured Tabs & Sections -->
+          <div class="card" style="padding: 36px; margin-bottom: 32px;">
+            <div style="margin-bottom: 36px;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                <span>📖</span> Deskripsi Lengkap &amp; Solusi
+              </h2>
+              <div style="font-size: 1.02rem;">
+                ${descParagraphs}
               </div>
             </div>
 
-            <div style="margin-bottom: 32px;">
-              <h3 style="font-size: 1.3rem; margin-bottom: 14px;">Deskripsi Lengkap</h3>
-              <p style="color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap;">${escapeHtml(prod.description || '')}</p>
+            <!-- Features & Deliverables -->
+            <div style="margin-bottom: 36px;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                <span>✨</span> Apa Saja yang Anda Dapatkan?
+              </h2>
+              <div class="features-grid-list">
+                ${featuresListHtml}
+              </div>
             </div>
 
-            <div style="margin-bottom: 32px;">
-              <h3 style="font-size: 1.3rem; margin-bottom: 16px;">Apa Saja yang Anda Dapatkan?</h3>
-              <ul style="background-color: var(--bg-input); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-                ${featuresList}
-              </ul>
+            <!-- Target Audience -->
+            <div style="margin-bottom: 36px;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                <span>🎯</span> Untuk Siapa Produk Ini Cocok?
+              </h2>
+              <div class="audience-grid">
+                <div class="audience-card">
+                  <span style="font-size: 1.8rem;">🚀</span>
+                  <h4>Kreator Konten &amp; Pemasar</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Ingin membuat materi konten dan promosi berkonversi tinggi tanpa kehabisan ide setiap hari.</p>
+                </div>
+                <div class="audience-card">
+                  <span style="font-size: 1.8rem;">💼</span>
+                  <h4>Pemilik Bisnis &amp; UMKM</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Mencari otomasi alur kerja, laporan keuangan otomatis, dan website profesional dengan biaya hemat.</p>
+                </div>
+                <div class="audience-card">
+                  <span style="font-size: 1.8rem;">⚡</span>
+                  <h4>Freelancer &amp; Praktisi</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Membutuhkan template standar industri siap pakai untuk mempercepat pengerjaan proyek klien.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3 Easy Steps to Buy -->
+            <div style="margin-bottom: 36px;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                <span>🛒</span> Alur Pemesanan &amp; Pengiriman (3 Langkah Cepat)
+              </h2>
+              <div class="order-steps-grid">
+                <div class="order-step-card">
+                  <div class="step-num-badge">1</div>
+                  <h4 style="font-size: 1rem; margin-bottom: 8px;">Pilih Produk &amp; Formulir</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Klik tombol Pesan Sekarang dan isi nama serta nomor WhatsApp Anda.</p>
+                </div>
+                <div class="order-step-card">
+                  <div class="step-num-badge">2</div>
+                  <h4 style="font-size: 1rem; margin-bottom: 8px;">Konfirmasi WhatsApp</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Sistem mengarahkan Anda ke WhatsApp resmi Arra Digital untuk verifikasi otomatis.</p>
+                </div>
+                <div class="order-step-card">
+                  <div class="step-num-badge">3</div>
+                  <h4 style="font-size: 1rem; margin-bottom: 8px;">Akses File Langsung</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Link file, spreadsheet, atau jadwal konsultasi dikirimkan secara instan.</p>
+                </div>
+              </div>
             </div>
 
             ${isSample ? `
-              <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 18px 22px; border-radius: var(--radius-md); font-size: 0.9rem; color: #FCD34D;">
-                <strong>Catatan Transparansi Produk:</strong> Produk ini ditandai sebagai data sampel resmi untuk mendemonstrasikan kapabilitas sistem dan alur transaksi. Pemilik Arra Digital dapat memperbarui materi atau menyelaraskan harga melalui panel admin.
+              <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 20px 24px; border-radius: var(--radius-md); font-size: 0.9rem; color: #FCD34D;">
+                <strong style="display: block; margin-bottom: 6px;">Catatan Transparansi Produk:</strong>
+                Produk ini adalah katalog resmi Arra Digital. Seluruh aset digital, formula prompt, maupun source code template dapat disesuaikan secara bebas sesuai kebutuhan spesifik usaha Anda.
               </div>
             ` : ''}
           </div>
@@ -506,8 +644,11 @@ async function renderProductDetailView(slug) {
 }
 
 function renderToolsView() {
-  document.title = `Direktori Tools AI Interaktif | ARRA DIGITAL`;
+  document.title = `Direktori Tools AI Interaktif & Nalar Gemini | ARRA DIGITAL`;
   const app = document.getElementById('app-main');
+
+  const userGeminiKey = localStorage.getItem('arra_gemini_api_key') || '';
+  const isGeminiConnected = Boolean(userGeminiKey.trim());
 
   const toolsList = [
     { id: 'affiliate_hooks', name: 'Hook Video AI Affiliate', icon: '⚡' },
@@ -525,11 +666,32 @@ function renderToolsView() {
 
   app.innerHTML = `
     <section class="section">
-      <div class="container" style="max-width: 960px;">
+      <div class="container" style="max-width: 980px;">
         <div class="section-header">
-          <span class="badge-pill badge-purple" style="margin-bottom: 12px;">Tanpa Perlu Akun Berbayar</span>
-          <h2>Tools AI Kreatif &amp; Otomasi</h2>
-          <p>Gunakan generator konten dan skrip instan ini untuk mempercepat riset dan copywriting Anda tanpa biaya API tambahan.</p>
+          <span class="badge-pill badge-purple" style="margin-bottom: 12px;">Didukung Google Gemini AI 2.5 / 1.5 Flash</span>
+          <h2>Tools AI Kreatif, Nalar Strategis &amp; Otomasi</h2>
+          <p>Ditenagai analisis psikologi audiens Indonesia. Hasil tidak kaku, bernalar tajam, dan siap mendorong konversi penjualan.</p>
+        </div>
+
+        <!-- Gemini Engine Status Banner -->
+        <div class="gemini-engine-banner">
+          <div class="gemini-engine-info">
+            <span class="gemini-pulse-dot ${isGeminiConnected ? '' : 'fallback'}"></span>
+            <div>
+              <div class="gemini-engine-title">
+                ${isGeminiConnected ? 'Google Gemini 2.5 / 1.5 Flash Terhubung' : 'Mesin Strategi Cerdas Arra (Mode Standby)'}
+                <span class="badge-pill badge-blue" style="font-size: 0.72rem; padding: 2px 7px;">${isGeminiConnected ? 'API Key Pribadi Aktif' : 'Nalar Heuristik Lokal'}</span>
+              </div>
+              <div class="gemini-engine-desc">
+                ${isGeminiConnected
+                  ? 'Prompt dialirkan langsung ke Google Gemini dengan nalar adaptif penuh dan gaya bahasa alami.'
+                  : 'Gunakan kunci API Gemini Anda sendiri (100% gratis dari Google AI Studio) untuk variasi kreatif tanpa batas.'}
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openGeminiApiKeyModal()" style="font-size: 0.82rem;">
+            ⚙️ ${isGeminiConnected ? 'Kelola Kunci Gemini' : 'Hubungkan API Gemini Gratis'}
+          </button>
         </div>
 
         <div class="tools-tabs">
@@ -545,27 +707,29 @@ function renderToolsView() {
 }
 
 function renderToolFormHtml(toolId) {
+  STATE.selectedTone = STATE.selectedTone || 'viral_casual';
+
   let formFields = '';
   if (toolId === 'affiliate_hooks' || toolId === 'video_script') {
     formFields = `
       <div class="grid-2">
         <div class="form-group">
-          <label>Nama Produk / Alat</label>
-          <input type="text" id="tool_product_name" class="form-control" value="Mini Tripod Bluetooth Lipat" placeholder="contoh: Microphone Wireless, Skincare Serum" />
+          <label>Nama Produk / Alat *</label>
+          <input type="text" id="tool_product_name" class="form-control" value="Mini Tripod Bluetooth Lipat" placeholder="contoh: Microphone Wireless, Skincare Serum" required />
         </div>
         <div class="form-group">
-          <label>Kategori / Niche</label>
-          <input type="text" id="tool_niche" class="form-control" value="Gadget & Konten Kreator" placeholder="contoh: Fashion, Kuliner, Home Living" />
+          <label>Kategori / Niche *</label>
+          <input type="text" id="tool_niche" class="form-control" value="Gadget & Konten Kreator" placeholder="contoh: Fashion, Kuliner, Home Living" required />
         </div>
       </div>
       <div class="grid-2">
         <div class="form-group">
-          <label>Target Audiens</label>
-          <input type="text" id="tool_audience" class="form-control" value="Kreator TikTok Pemula yang suka rekam video sendiri" />
+          <label>Target Audiens Spesifik</label>
+          <input type="text" id="tool_audience" class="form-control" value="Kreator TikTok Pemula yang suka rekam video sendiri" placeholder="siapa yang paling membutuhkan produk ini?" />
         </div>
         <div class="form-group">
           <label>Manfaat Utama (Core Benefit)</label>
-          <input type="text" id="tool_benefit" class="form-control" value="Bisa rekam video stabil tanpa minta bantuan orang lain" />
+          <input type="text" id="tool_benefit" class="form-control" value="Bisa rekam video stabil tanpa minta bantuan orang lain" placeholder="apa transformasi terbesar yang didapat?" />
         </div>
       </div>
     `;
@@ -573,51 +737,67 @@ function renderToolFormHtml(toolId) {
     formFields = `
       <div class="grid-2">
         <div class="form-group">
-          <label>Nama Produk / Program</label>
-          <input type="text" id="tool_product_name" class="form-control" value="Business Template Pack" />
+          <label>Nama Produk / Program *</label>
+          <input type="text" id="tool_product_name" class="form-control" value="Business Template Pack" required />
         </div>
         <div class="form-group">
-          <label>Niche Bisnis</label>
-          <input type="text" id="tool_niche" class="form-control" value="Manajemen Usaha UMKM" />
+          <label>Niche Bisnis *</label>
+          <input type="text" id="tool_niche" class="form-control" value="Manajemen Usaha UMKM" required />
         </div>
       </div>
       <div class="form-group">
         <label>Manfaat / Penawaran Utama</label>
         <input type="text" id="tool_benefit" class="form-control" value="Rekap penjualan dan omzet harian otomatis tanpa rumus rumit" />
       </div>
+      <div class="form-group">
+        <label>Target Audiens</label>
+        <input type="text" id="tool_audience" class="form-control" value="Pemilik toko online & UMKM yang lelah rekap manual" />
+      </div>
     `;
   } else if (toolId === 'content_calendar') {
     formFields = `
       <div class="grid-2">
         <div class="form-group">
-          <label>Topik / Niche Utama</label>
-          <input type="text" id="tool_niche" class="form-control" value="Tips Affiliate Pemula" />
+          <label>Topik / Niche Utama *</label>
+          <input type="text" id="tool_niche" class="form-control" value="Tips Affiliate Pemula" required />
         </div>
         <div class="form-group">
-          <label>Produk yang Direkomendasikan</label>
-          <input type="text" id="tool_product_name" class="form-control" value="AI Affiliate Starter Kit" />
+          <label>Produk yang Dipromosikan *</label>
+          <input type="text" id="tool_product_name" class="form-control" value="AI Affiliate Starter Kit" required />
         </div>
       </div>
-      <div class="form-group">
-        <label>Target Followers</label>
-        <input type="text" id="tool_audience" class="form-control" value="Karyawan atau ibu rumah tangga yang ingin dapat komisi tambahan" />
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Target Followers</label>
+          <input type="text" id="tool_audience" class="form-control" value="Karyawan atau ibu rumah tangga yang ingin dapat komisi sampingan" />
+        </div>
+        <div class="form-group">
+          <label>Manfaat Utama Produk</label>
+          <input type="text" id="tool_benefit" class="form-control" value="Mulai bikin konten tanpa pusing mikir skrip dari nol" />
+        </div>
       </div>
     `;
   } else {
     formFields = `
       <div class="grid-2">
         <div class="form-group">
-          <label>Nama Usaha / Brand</label>
-          <input type="text" id="tool_product_name" class="form-control" value="Kopi Senja Nusantara" />
+          <label>Nama Usaha / Brand *</label>
+          <input type="text" id="tool_product_name" class="form-control" value="Kopi Senja Nusantara" required />
         </div>
         <div class="form-group">
-          <label>Jenis Bisnis</label>
-          <input type="text" id="tool_niche" class="form-control" value="Kedai Kopi & Roastery Lokal" />
+          <label>Jenis Bisnis &amp; Niche *</label>
+          <input type="text" id="tool_niche" class="form-control" value="Kedai Kopi & Roastery Lokal" required />
         </div>
       </div>
-      <div class="form-group">
-        <label>Tujuan Website & Keunggulan Produk</label>
-        <input type="text" id="tool_benefit" class="form-control" value="Tampilkan menu signature, petunjuk lokasi Google Maps, dan reservasi meja via WhatsApp" />
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Target Pengunjung Website</label>
+          <input type="text" id="tool_audience" class="form-control" value="Pecinta kopi specialty & komunitas work-from-cafe di kota besar" />
+        </div>
+        <div class="form-group">
+          <label>Tujuan Website &amp; Keunggulan Produk</label>
+          <input type="text" id="tool_benefit" class="form-control" value="Tampilkan menu signature, petunjuk lokasi Google Maps, dan reservasi meja via WhatsApp" />
+        </div>
       </div>
     `;
   }
@@ -625,10 +805,36 @@ function renderToolFormHtml(toolId) {
   return `
     <form onsubmit="handleExecuteTool(event, '${toolId}')">
       ${formFields}
+
+      <!-- Tone / Gaya Bahasa Selector -->
+      <div class="tone-selector-wrap">
+        <label>Pilih Gaya Bahasa (Tone of Voice):</label>
+        <div class="tone-chip-group">
+          <button type="button" class="tone-chip-btn ${STATE.selectedTone === 'viral_casual' ? 'active' : ''}" onclick="selectToolTone('viral_casual')">
+            🚀 Santai &amp; Viral (FYP TikTok/Reels)
+          </button>
+          <button type="button" class="tone-chip-btn ${STATE.selectedTone === 'high_conversion' ? 'active' : ''}" onclick="selectToolTone('high_conversion')">
+            🔥 Persuasif &amp; Closing Cepat (Promo)
+          </button>
+          <button type="button" class="tone-chip-btn ${STATE.selectedTone === 'story_authority' ? 'active' : ''}" onclick="selectToolTone('story_authority')">
+            🎓 Storytelling &amp; Edukatif (Otoritas)
+          </button>
+          <button type="button" class="tone-chip-btn ${STATE.selectedTone === 'professional_clean' ? 'active' : ''}" onclick="selectToolTone('professional_clean')">
+            💼 Elegan &amp; Profesional (B2B/Jasa)
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom Angle / Instruction (Optional) -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label>Instruksi Khusus / Angle Unik (Opsional)</label>
+        <input type="text" id="tool_custom_instruction" class="form-control" placeholder="contoh: Soroti garansi tanpa resiko, atau gunakan punchline humor di pembuka" />
+      </div>
+
       <div style="margin-top: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-        <span class="text-muted" style="font-size: 0.85rem;">⚡ Siap dijalankan instan sisi server (Nol delay)</span>
+        <span class="text-muted" style="font-size: 0.85rem;">🧠 Nalar AI mendalam &middot; Bahasa mengalir bebas kaku</span>
         <button type="submit" class="btn btn-primary" id="btn-generate-tool">
-          Generate Sekarang
+          ⚡ Generate Konten Bernalar
         </button>
       </div>
     </form>
@@ -636,98 +842,341 @@ function renderToolFormHtml(toolId) {
   `;
 }
 
+function selectToolTone(tone) {
+  STATE.selectedTone = tone;
+  document.querySelectorAll('.tone-chip-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const currentBtn = event && event.target ? event.target.closest('.tone-chip-btn') : null;
+  if (currentBtn) currentBtn.classList.add('active');
+}
+
 function switchToolTab(toolId) {
   STATE.selectedTool = toolId;
   renderToolsView();
 }
 
-async function handleExecuteTool(e, toolId) {
-  e.preventDefault();
+async function handleExecuteTool(e, toolId, extraInstruction = '') {
+  if (e && e.preventDefault) e.preventDefault();
   const btn = document.getElementById('btn-generate-tool');
   const outContainer = document.getElementById('tool-output-container');
-  btn.disabled = true;
-  btn.textContent = 'Memproses...';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Memproses Nalar AI...';
+  }
+
+  const customInputVal = document.getElementById('tool_custom_instruction')?.value || '';
+  const finalCustomInstruction = extraInstruction ? `${customInputVal} ${extraInstruction}`.trim() : customInputVal;
+  const clientApiKey = localStorage.getItem('arra_gemini_api_key') || '';
 
   const inputs = {
     product_name: document.getElementById('tool_product_name')?.value || 'Produk Digital',
     niche: document.getElementById('tool_niche')?.value || 'Affiliate',
     audience: document.getElementById('tool_audience')?.value || 'Kreator Indonesia',
-    benefit: document.getElementById('tool_benefit')?.value || 'Meningkatkan konversi'
+    benefit: document.getElementById('tool_benefit')?.value || 'Meningkatkan konversi',
+    tone: STATE.selectedTone || 'viral_casual',
+    custom_instruction: finalCustomInstruction,
+    apiKey: clientApiKey,
+    user_gemini_key: clientApiKey
   };
 
   try {
     const res = await fetch('/api/tools/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(clientApiKey ? { 'x-gemini-key': clientApiKey } : {})
+      },
       body: JSON.stringify({ toolType: toolId, inputs })
     });
     const json = await res.json();
     if (!json.success) throw new Error(json.error || 'Gagal menghasilkan konten');
 
     const result = json.result;
-    const formattedText = formatToolOutputToText(toolId, result.data);
+    STATE.lastToolResult = { toolId, result, inputs };
+    renderToolOutputDisplay(outContainer, toolId, result);
+  } catch (err) {
+    outContainer.innerHTML = `<div class="card" style="margin-top: 20px; color: #F87171; border-color: #EF4444;">Error: ${escapeHtml(err.message)}</div>`;
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '⚡ Generate Konten Bernalar';
+    }
+  }
+}
 
-    outContainer.innerHTML = `
-      <div class="tool-output-box">
-        <div class="tool-output-header">
-          <div>
-            <h4 style="font-weight: 700;">Hasil Konten Terstruktur</h4>
-            <span class="text-muted" style="font-size: 0.8rem;">${result.data.summary || 'Generated Content'}</span>
+function renderToolOutputDisplay(outContainer, toolId, result) {
+  const data = result.data || {};
+  const formattedText = formatToolOutputToText(toolId, data);
+  const reasoning = data.ai_reasoning;
+
+  let reasoningHtml = '';
+  if (reasoning) {
+    reasoningHtml = `
+      <div class="ai-reasoning-card">
+        <div class="ai-reasoning-card-header">
+          <div class="ai-reasoning-card-title">
+            <span>🧠</span> Nalar &amp; Analisis Strategi AI
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard(this, \`${escapeJs(formattedText)}\`)">
-            📋 Salin Hasil
-          </button>
+          <span class="badge-pill badge-purple" style="font-size: 0.76rem;">${escapeHtml(data.tone || 'Strategi Terarah')}</span>
         </div>
-        <div class="tool-output-content">${escapeHtml(formattedText)}</div>
-        <p class="text-muted" style="font-size: 0.78rem; margin-top: 16px; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
-          *${result.disclaimer}
-        </p>
+
+        <div class="ai-reasoning-grid">
+          ${reasoning.audience_psychology ? `
+            <div class="ai-reasoning-item">
+              <div class="ai-reasoning-item-label">Psikologi Audiens Target</div>
+              <div class="ai-reasoning-item-text">${escapeHtml(reasoning.audience_psychology)}</div>
+            </div>
+          ` : ''}
+          ${reasoning.strategic_angle ? `
+            <div class="ai-reasoning-item">
+              <div class="ai-reasoning-item-label">Nalar Sudut Pandang (Angle)</div>
+              <div class="ai-reasoning-item-text">${escapeHtml(reasoning.strategic_angle)}</div>
+            </div>
+          ` : ''}
+          ${(reasoning.conversion_trigger || reasoning.conversion_driver) ? `
+            <div class="ai-reasoning-item">
+              <div class="ai-reasoning-item-label">Pemicu Konversi Utama</div>
+              <div class="ai-reasoning-item-text">${escapeHtml(reasoning.conversion_trigger || reasoning.conversion_driver)}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        ${reasoning.director_notes ? `
+          <div class="ai-director-box">
+            <span style="font-size: 1.25rem;">🎬</span>
+            <div>
+              <strong>Arahan Sutradara &amp; Eksekusi:</strong> ${escapeHtml(reasoning.director_notes)}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
-  } catch (err) {
-    outContainer.innerHTML = `<div class="card" style="margin-top: 20px; color: #F87171;">Error: ${escapeHtml(err.message)}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Generate Sekarang';
   }
+
+  let specificContentHtml = '';
+  if (toolId === 'affiliate_hooks' && Array.isArray(data.items)) {
+    specificContentHtml = `
+      <div class="ai-hooks-list">
+        ${data.items.map((it, idx) => `
+          <div class="ai-hook-card">
+            <div class="ai-hook-top">
+              <span class="badge-pill badge-blue" style="font-size: 0.74rem;">${escapeHtml(it.type || `Hook #${idx + 1}`)}</span>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="copyToClipboard(this, \`${escapeJs(it.text)}\`)" title="Salin hook ini">
+                📋 Salin
+              </button>
+            </div>
+            <div class="ai-hook-text">"${escapeHtml(it.text)}"</div>
+            ${it.angle ? `<div class="ai-hook-angle">💡 <strong>Sudut Pandang:</strong> ${escapeHtml(it.angle)}</div>` : ''}
+            ${it.psychology ? `<div class="ai-hook-angle" style="color: #A78BFA;">🎯 <strong>Psikologi:</strong> ${escapeHtml(it.psychology)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else if (toolId === 'video_script' && Array.isArray(data.timeline)) {
+    specificContentHtml = `
+      <div class="ai-script-timeline">
+        ${data.timeline.map(seg => `
+          <div class="ai-script-segment">
+            <div class="ai-script-segment-time">⏱️ ${escapeHtml(seg.segment || seg.time || '')}</div>
+            <div style="font-size: 0.92rem; margin-bottom: 6px;"><strong style="color: #CBD5E1;">Visual:</strong> ${escapeHtml(seg.visual || '')}</div>
+            <div style="font-size: 0.98rem; font-weight: 600; color: #FFFFFF; margin-bottom: 6px;"><strong style="color: #60A5FA;">Audio:</strong> ${escapeHtml(seg.audio || '')}</div>
+            ${seg.on_screen_text ? `<div style="font-size: 0.85rem; color: #FCD34D;"><strong>Teks Layar:</strong> ${escapeHtml(seg.on_screen_text)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    specificContentHtml = `
+      <div class="tool-output-content">${escapeHtml(formattedText)}</div>
+    `;
+  }
+
+  const modelBadge = result.source === 'gemini_api'
+    ? `<span class="badge-pill badge-blue">✨ Powered by Google Gemini (${result.model || 'Flash'})</span>`
+    : `<span class="badge-pill badge-purple">⚡ Mesin Strategis Arra Digital</span>`;
+
+  outContainer.innerHTML = `
+    <div class="tool-output-box">
+      <div class="tool-output-header">
+        <div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px; flex-wrap: wrap;">
+            <h4 style="font-weight: 750; font-size: 1.15rem;">Hasil Konten &amp; Nalar Strategis</h4>
+            ${modelBadge}
+          </div>
+          <span class="text-muted" style="font-size: 0.82rem;">${escapeHtml(data.summary || 'Generated Content')}</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard(this, \`${escapeJs(formattedText)}\`)">
+          📋 Salin Seluruh Teks
+        </button>
+      </div>
+
+      ${reasoningHtml}
+
+      <div style="margin-top: 18px;">
+        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+          <span>💡</span> Materi Siap Pakai:
+        </h4>
+        ${specificContentHtml}
+      </div>
+
+      <!-- Quick AI Refinements -->
+      <div class="ai-refinement-bar">
+        <span style="font-size: 0.84rem; color: var(--text-muted); font-weight: 600;">Eksplorasi Nalar Lanjutan:</span>
+        <div class="ai-refinement-chips">
+          <button type="button" class="btn btn-secondary btn-xs" onclick="refineCurrentTool('alternatif')">🔄 5 Variasi Lain</button>
+          <button type="button" class="btn btn-secondary btn-xs" onclick="refineCurrentTool('deep_dive')">🧠 Bedah Psikologi Lebih Dalam</button>
+          <button type="button" class="btn btn-secondary btn-xs" onclick="refineCurrentTool('shorter')">⚡ Buat Lebih Singkat &amp; Padat</button>
+        </div>
+      </div>
+
+      <p class="text-muted" style="font-size: 0.78rem; margin-top: 14px; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+        *${result.disclaimer}
+      </p>
+    </div>
+  `;
+}
+
+function refineCurrentTool(action) {
+  if (!STATE.lastToolResult) return;
+  const { toolId } = STATE.lastToolResult;
+
+  let extra = '';
+  if (action === 'alternatif') extra = 'Berikan 5 variasi alternatif yang sama sekali berbeda dengan sudut pandang unik.';
+  if (action === 'deep_dive') extra = 'Bongkar lebih detail psikologi audiens target dan alasan alam bawah sadar yang memicu konversi.';
+  if (action === 'shorter') extra = 'Buat versi yang jauh lebih ringkas, padat, to the point, dan cocok untuk video 30 detik.';
+
+  const customInput = document.getElementById('tool_custom_instruction');
+  if (customInput) customInput.value = extra;
+
+  handleExecuteTool(new Event('submit'), toolId, extra);
 }
 
 function formatToolOutputToText(toolId, data) {
+  if (!data) return '';
+
   if (toolId === 'affiliate_hooks') {
     let txt = `=== 5 HOOK PENAHAN SCROLL ===\n\n`;
+    if (data.ai_reasoning) {
+      txt += `[ANALISIS NALAR AI]\n`;
+      txt += `Psikologi Audiens: ${data.ai_reasoning.audience_psychology || '-'}\n`;
+      txt += `Nalar Angle: ${data.ai_reasoning.strategic_angle || '-'}\n`;
+      txt += `Pemicu Konversi: ${data.ai_reasoning.conversion_trigger || '-'}\n\n`;
+    }
     (data.items || []).forEach((it, idx) => {
-      txt += `${idx + 1}. [${it.type}]\n   "${it.text}"\n   (Sudut Pandang: ${it.angle})\n\n`;
+      txt += `${idx + 1}. [${it.type}]\n   "${it.text}"\n   (Nalar: ${it.angle || it.psychology || '-'})\n\n`;
     });
     return txt.trim();
   }
+
   if (toolId === 'video_script') {
     let txt = `=== SKRIP VIDEO 60 DETIK ===\n\n`;
+    if (data.ai_reasoning) {
+      txt += `[ANALISIS NALAR AI]\n`;
+      txt += `Strategi Alur: ${data.ai_reasoning.strategic_angle || '-'}\n`;
+      txt += `Catatan Sutradara: ${data.ai_reasoning.director_notes || '-'}\n\n`;
+    }
     (data.timeline || []).forEach(seg => {
-      txt += `[${seg.segment}]\nVisual : ${seg.visual}\nAudio  : ${seg.audio}\n\n`;
+      txt += `[${seg.segment || seg.time}]\nVisual     : ${seg.visual}\nAudio/Kata : ${seg.audio}\n${seg.on_screen_text ? `Teks Layar : ${seg.on_screen_text}\n` : ''}\n`;
     });
     return txt.trim();
   }
+
   if (toolId === 'caption_cta') {
-    let txt = `${data.caption}\n\nHashtags:\n${data.hashtags}\n\nVariasi CTA Pilihan:\n`;
+    let txt = `${data.caption || ''}\n\nHashtags:\n${data.hashtags || ''}\n\nVariasi CTA Pilihan:\n`;
     (data.cta_variations || []).forEach((c, idx) => { txt += `${idx + 1}. ${c}\n`; });
     return txt.trim();
   }
+
   if (toolId === 'content_calendar') {
     let txt = `=== KALENDER KONTEN 7 HARI ===\n\n`;
     (data.schedule || []).forEach(s => {
-      txt += `• ${s.day} (${s.theme}) | Format: ${s.format}\n  Topik: "${s.topic}"\n\n`;
+      txt += `• ${s.day} (${s.theme}) | Format: ${s.format}\n  Topik: "${s.topic}"\n  CTA: ${s.cta || '-'}\n\n`;
     });
     return txt.trim();
   }
+
   if (toolId === 'website_brief') {
     let txt = `=== BRIEF SPESIFIKASI WEBSITE ===\n\n`;
-    txt += `Niche Klien : ${data.project_overview.client_niche}\nTarget     : ${data.project_overview.target_audience}\nTujuan     : ${data.project_overview.primary_goal}\n\nRekomendasi Struktur Halaman:\n`;
+    if (data.project_overview) {
+      txt += `Niche Klien : ${data.project_overview.client_niche || '-'}\nTarget     : ${data.project_overview.target_audience || '-'}\nTujuan     : ${data.project_overview.primary_goal || '-'}\n\n`;
+    }
+    txt += `Rekomendasi Struktur Halaman:\n`;
     (data.recommended_structure || []).forEach((st, i) => { txt += `${i + 1}. ${st}\n`; });
-    txt += `\nRekomendasi Hosting Hemat: ${data.tech_recommendation}`;
+    if (data.tech_recommendation) txt += `\nRekomendasi Hosting Hemat: ${data.tech_recommendation}`;
     return txt.trim();
   }
+
   return JSON.stringify(data, null, 2);
 }
+
+// Modal Kunci API Gemini
+window.openGeminiApiKeyModal = function() {
+  const modal = document.getElementById('order-modal');
+  const modalBody = document.getElementById('order-modal-body');
+  const existingKey = localStorage.getItem('arra_gemini_api_key') || '';
+
+  modalBody.innerHTML = `
+    <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+      <span>⚙️</span> Pengaturan API Google Gemini
+    </h3>
+    <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+      Hubungkan kunci API pribadi Anda dari Google AI Studio. Dengan kunci ini, seluruh generator AI beroperasi menggunakan model <strong>Gemini 2.5 Flash / 1.5 Flash</strong> dengan nalar adaptif tanpa batas.
+    </p>
+
+    <div style="background: rgba(71, 120, 255, 0.08); border: 1px solid rgba(71, 120, 255, 0.25); padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 0.88rem;">
+      <div style="font-weight: 600; color: #FFFFFF; margin-bottom: 4px;">💡 Cara Mendapatkan Kunci API Gratis:</div>
+      <ol style="margin-left: 18px; color: var(--text-secondary); line-height: 1.6; list-style: decimal;">
+        <li>Buka <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-blue" style="text-decoration: underline;">Google AI Studio (aistudio.google.com)</a></li>
+        <li>Login dengan akun Google Anda</li>
+        <li>Klik tombol <strong>"Create API Key"</strong> dan salin kuncinya ke kolom di bawah ini</li>
+      </ol>
+    </div>
+
+    <form onsubmit="handleSaveGeminiKey(event)">
+      <div class="form-group">
+        <label>Google Gemini API Key *</label>
+        <input type="password" id="input_gemini_key" class="form-control" value="${escapeHtml(existingKey)}" placeholder="AIzaSy..." required style="letter-spacing: 1px;" />
+      </div>
+
+      <div id="gemini-key-status" style="font-size: 0.85rem; margin-bottom: 14px; display: none;"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Batal</button>
+        ${existingKey ? `<button type="button" class="btn btn-secondary" onclick="handleClearGeminiKey()" style="color: #EF4444;">Hapus Kunci</button>` : ''}
+        <button type="submit" class="btn btn-primary" id="btn-save-gemini-key" style="flex: 1;">
+          Simpan Kunci API
+        </button>
+      </div>
+    </form>
+  `;
+
+  modal.classList.add('open');
+};
+
+window.handleSaveGeminiKey = function(e) {
+  e.preventDefault();
+  const input = document.getElementById('input_gemini_key');
+  const statusEl = document.getElementById('gemini-key-status');
+  const key = input ? input.value.trim() : '';
+
+  if (!key) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#EF4444';
+    statusEl.textContent = 'Kunci API tidak boleh kosong.';
+    return;
+  }
+
+  localStorage.setItem('arra_gemini_api_key', key);
+  closeOrderModal();
+  renderToolsView();
+};
+
+window.handleClearGeminiKey = function() {
+  localStorage.removeItem('arra_gemini_api_key');
+  closeOrderModal();
+  renderToolsView();
+};
 
 function renderWebsiteServiceView() {
   document.title = `Jasa Pembuatan Website Kustom | ARRA DIGITAL`;
@@ -1391,25 +1840,35 @@ async function loadAdminTabData(tab) {
 
       const rows = products.map(p => `
         <tr>
+          <td>
+            ${p.image_url
+              ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" class="admin-table-product-thumb" onclick="openImageZoom('${p.image_url}', '${escapeHtml(p.name)}')" title="Klik untuk pratinjau zoom" />`
+              : `<div class="admin-table-product-nothumb" title="Belum ada gambar">📦</div>`
+            }
+          </td>
           <td><strong>${escapeHtml(p.name)}</strong></td>
           <td><span class="badge-pill badge-purple">${escapeHtml(p.category)}</span></td>
           <td>${formatIDR(p.price)}</td>
           <td><span class="badge-pill ${p.status === 'active' ? 'badge-success' : 'badge-pending'}">${p.status}</span></td>
           <td>
-            <button class="btn btn-secondary btn-sm" onclick="openAdminEditProductModal('${p.id}')">Edit</button>
+            <button class="btn btn-secondary btn-sm" onclick="openAdminEditProductModal('${p.id}')">Edit &amp; Foto</button>
           </td>
         </tr>
       `).join('');
 
       mainArea.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <h2 style="font-size: 1.8rem; font-weight: 800;">Manajemen Produk &amp; Layanan</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="font-size: 1.8rem; font-weight: 800;">Manajemen Produk &amp; Layanan</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Kelola produk, upload gambar sampul produk dipasarkan, deskripsi, dan harga.</p>
+          </div>
           <button class="btn btn-primary" onclick="openAdminEditProductModal(null)">+ Tambah Produk Baru</button>
         </div>
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
+                <th style="width: 72px;">Sampul</th>
                 <th>Nama Produk</th>
                 <th>Kategori</th>
                 <th>Harga (IDR)</th>
@@ -1759,9 +2218,41 @@ async function handleOrderSubmit(e) {
 // ============================================================================
 // 5. HELPER COMPONENTS & UTILS
 // ============================================================================
+function getProductThumbnailUrl(p) {
+  if (p && p.image_url && typeof p.image_url === 'string' && p.image_url.trim()) {
+    return p.image_url.trim();
+  }
+  const slug = (p && p.slug ? p.slug : '').toLowerCase();
+  const name = (p && p.name ? p.name : '').toLowerCase();
+
+  if (slug.includes('affiliate') || name.includes('affiliate')) {
+    return '/assets/products/ai-affiliate-starter-kit.jpg';
+  }
+  if (slug.includes('business') || slug.includes('template') || name.includes('business')) {
+    return '/assets/products/business-template-pack.jpg';
+  }
+  if (slug.includes('website-starter') || name.includes('starter kit') || name.includes('landing page template')) {
+    return '/assets/products/website-starter-kit.jpg';
+  }
+  if (slug.includes('jasa-pembuatan-website') || name.includes('jasa pembuatan website')) {
+    return '/assets/products/jasa-pembuatan-website.svg';
+  }
+  if (slug.includes('otomasi') || slug.includes('apps-script') || name.includes('otomasi')) {
+    return '/assets/products/jasa-otomasi-google-apps-script.svg';
+  }
+  if (slug.includes('laundry') || name.includes('laundry')) {
+    return '/assets/products/spreadsheet-laundry-pos-gas.svg';
+  }
+  if (slug.includes('notion') || name.includes('notion')) {
+    return '/assets/products/template-notion-freelance-os.svg';
+  }
+  return '/assets/products/website-starter-kit.jpg';
+}
+
 function renderProductCardHtml(p) {
   const isQuote = p.price === 0;
   const isSample = p.name.includes('Sampel Demo');
+  const imgUrl = getProductThumbnailUrl(p);
   const previewFeatures = (p.features || []).slice(0, 3).map(f => `
     <li>
       <span class="feature-check">✓</span>
@@ -1771,29 +2262,40 @@ function renderProductCardHtml(p) {
 
   return `
     <article class="card product-card">
-      <div class="product-top">
-        <div class="product-meta">
+      <div class="product-thumb-container">
+        <a href="/produk/${p.slug}" data-route="/produk/${p.slug}" class="product-thumb-link" aria-label="Lihat detail ${escapeHtml(p.name)}">
+          <img src="${imgUrl}" alt="${escapeHtml(p.name)}" class="product-card-thumb" loading="lazy" onerror="this.onerror=null;this.src='/assets/products/website-starter-kit.jpg';">
+        </a>
+        <div class="product-thumb-badge-overlay">
           <span class="badge-pill badge-purple">${escapeHtml(p.category)}</span>
           ${isSample ? '<span class="badge-pill badge-sample">Sampel Demo</span>' : ''}
         </div>
-        <h3 class="product-title">
-          <a href="/produk/${p.slug}" data-route="/produk/${p.slug}">${escapeHtml(p.name)}</a>
-        </h3>
-        <p class="product-desc">${escapeHtml(p.short_description || '')}</p>
-        <ul class="product-features-preview">
-          ${previewFeatures}
-        </ul>
+        <button type="button" class="product-thumb-zoom-trigger" onclick="event.stopPropagation(); openImageZoom('${imgUrl}', '${escapeJs(p.name)}')" title="Lihat gambar produk dengan jelas (Perbesar)" aria-label="Perbesar gambar ${escapeHtml(p.name)}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          <span>Perbesar</span>
+        </button>
       </div>
-      <div class="product-bottom">
-        <div>
-          <span class="product-price-label">Investasi</span>
-          <div class="product-price-val">${formatIDR(p.price)}</div>
+      <div class="product-card-body">
+        <div class="product-top">
+          <h3 class="product-title">
+            <a href="/produk/${p.slug}" data-route="/produk/${p.slug}">${escapeHtml(p.name)}</a>
+          </h3>
+          <p class="product-desc">${escapeHtml(p.short_description || '')}</p>
+          <ul class="product-features-preview">
+            ${previewFeatures}
+          </ul>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <a href="/produk/${p.slug}" data-route="/produk/${p.slug}" class="btn btn-secondary btn-sm">Detail</a>
-          <button onclick="openOrderModal('${p.id}', '${escapeHtml(p.name)}', ${p.price})" class="btn btn-primary btn-sm">
-            ${isQuote ? 'Tanya' : 'Beli'}
-          </button>
+        <div class="product-bottom">
+          <div>
+            <span class="product-price-label">Investasi</span>
+            <div class="product-price-val">${formatIDR(p.price)}</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="/produk/${p.slug}" data-route="/produk/${p.slug}" class="btn btn-secondary btn-sm">Detail</a>
+            <button onclick="openOrderModal('${p.id}', '${escapeHtml(p.name)}', ${p.price})" class="btn btn-primary btn-sm">
+              ${isQuote ? 'Tanya' : 'Beli'}
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -1866,6 +2368,7 @@ function openAdminEditProductModal(productId) {
     status: 'active',
     short_description: '',
     description: '',
+    image_url: '',
     features: ['Fitur 1', 'Fitur 2'],
     delivery_type: 'digital_download',
     asset_reference: ''
@@ -1884,10 +2387,57 @@ function openAdminEditProductModal(productId) {
     </h3>
 
     <form onsubmit="handleAdminSaveProduct(event)">
+      <!-- 1. Foto / Sampul Produk Upload -->
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-weight: 700;">Foto / Sampul Produk Dipasarkan</span>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">Format: WebP, PNG, JPG, SVG (Maks. 8MB)</span>
+        </label>
+        
+        <input type="file" id="adm_prod_file_input" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" style="display: none;" />
+
+        <div id="adm_prod_dropzone" class="product-upload-dropzone">
+          <!-- Placeholder saat belum ada gambar -->
+          <div id="adm_prod_upload_placeholder" style="${prod.image_url ? 'display: none;' : 'display: block;'}">
+            <div class="upload-icon">📸</div>
+            <div class="upload-title">
+              Tarik &amp; lepas gambar ke sini, atau 
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-browse-image" style="margin-left: 4px;">Pilih File</button>
+            </div>
+            <div class="upload-subtitle">Gambar langsung dioptimasi otomatis untuk kecepatan loading web maksimal.</div>
+          </div>
+
+          <!-- Preview saat gambar sudah dipilih / ada -->
+          <div id="adm_prod_upload_preview" style="${prod.image_url ? 'display: block;' : 'display: none;'}">
+            <div class="upload-preview-wrapper">
+              <img id="adm_prod_preview_img" src="${escapeHtml(prod.image_url || '')}" alt="Pratinjau Sampul Produk" />
+              <div class="upload-preview-overlay">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-change-image">Ganti Foto</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-image">Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="adm_prod_upload_status" class="upload-status-badge">
+          ${prod.image_url ? '✅ Sampul produk aktif' : ''}
+        </div>
+
+        <input type="hidden" id="adm_prod_image_url" value="${escapeHtml(prod.image_url || '')}" />
+
+        <details style="margin-top: 8px; font-size: 0.82rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; user-select: none;">Gunakan URL / Path manual (Opsional)</summary>
+          <div style="margin-top: 6px;">
+            <input type="text" id="adm_prod_manual_url" class="form-control" style="font-size: 0.85rem;" placeholder="/assets/products/nama-file.jpg atau https://..." value="${escapeHtml(prod.image_url || '')}" />
+          </div>
+        </details>
+      </div>
+
       <div class="form-group">
         <label>Nama Produk *</label>
         <input type="text" id="adm_prod_name" class="form-control" value="${escapeHtml(prod.name)}" required />
       </div>
+
       <div class="grid-2">
         <div class="form-group">
           <label>Kategori *</label>
@@ -1941,7 +2491,220 @@ function openAdminEditProductModal(productId) {
     </form>
   `;
 
+  // Hubungkan Image Uploader Component
+  bindProductImageUploader({
+    dropzoneEl: document.getElementById('adm_prod_dropzone'),
+    fileInputEl: document.getElementById('adm_prod_file_input'),
+    placeholderEl: document.getElementById('adm_prod_upload_placeholder'),
+    previewEl: document.getElementById('adm_prod_upload_preview'),
+    previewImgEl: document.getElementById('adm_prod_preview_img'),
+    statusEl: document.getElementById('adm_prod_upload_status'),
+    hiddenUrlEl: document.getElementById('adm_prod_image_url'),
+    manualUrlEl: document.getElementById('adm_prod_manual_url'),
+    browseBtnEl: document.getElementById('btn-browse-image'),
+    changeBtnEl: document.getElementById('btn-change-image'),
+    removeBtnEl: document.getElementById('btn-remove-image'),
+    getSlug: () => document.getElementById('adm_prod_name')?.value || 'produk'
+  });
+
   modal.classList.add('open');
+}
+
+/**
+ * Utilitas Kompresi & Upload Gambar Produk di Browser
+ */
+function compressImageFile(file, maxWidth = 1280, maxHeight = 720, quality = 0.85) {
+  return new Promise((resolve) => {
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ dataUrl: e.target.result, isOptimized: false });
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let dataUrl;
+        try {
+          dataUrl = canvas.toDataURL('image/webp', quality);
+          if (!dataUrl.startsWith('data:image/webp')) {
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+        } catch (_) {
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+
+        resolve({ dataUrl, isOptimized: true, width, height });
+      };
+      img.onerror = () => {
+        resolve({ dataUrl: e.target.result, isOptimized: false });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function bindProductImageUploader({
+  dropzoneEl,
+  fileInputEl,
+  placeholderEl,
+  previewEl,
+  previewImgEl,
+  statusEl,
+  hiddenUrlEl,
+  manualUrlEl,
+  browseBtnEl,
+  changeBtnEl,
+  removeBtnEl,
+  getSlug
+}) {
+  if (!dropzoneEl || !fileInputEl) return;
+
+  const triggerBrowse = () => fileInputEl.click();
+  if (browseBtnEl) browseBtnEl.addEventListener('click', (e) => { e.stopPropagation(); triggerBrowse(); });
+  if (changeBtnEl) changeBtnEl.addEventListener('click', (e) => { e.stopPropagation(); triggerBrowse(); });
+
+  dropzoneEl.addEventListener('click', (e) => {
+    if (e.target.closest('#btn-remove-image') || e.target.closest('#btn-change-image')) return;
+    if (!hiddenUrlEl.value) triggerBrowse();
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzoneEl.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneEl.classList.add('dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzoneEl.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneEl.classList.remove('dragover');
+    });
+  });
+
+  dropzoneEl.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileSelected(files[0]);
+    }
+  });
+
+  fileInputEl.addEventListener('change', () => {
+    if (fileInputEl.files && fileInputEl.files.length > 0) {
+      handleFileSelected(fileInputEl.files[0]);
+    }
+  });
+
+  if (removeBtnEl) {
+    removeBtnEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hiddenUrlEl.value = '';
+      if (manualUrlEl) manualUrlEl.value = '';
+      fileInputEl.value = '';
+      previewImgEl.src = '';
+      previewEl.style.display = 'none';
+      placeholderEl.style.display = 'block';
+      statusEl.className = 'upload-status-badge';
+      statusEl.textContent = 'Gambar telah dihapus.';
+    });
+  }
+
+  if (manualUrlEl) {
+    manualUrlEl.addEventListener('input', () => {
+      const val = manualUrlEl.value.trim();
+      hiddenUrlEl.value = val;
+      if (val) {
+        previewImgEl.src = val;
+        placeholderEl.style.display = 'none';
+        previewEl.style.display = 'block';
+        statusEl.className = 'upload-status-badge';
+        statusEl.textContent = 'Menggunakan link URL manual.';
+      } else {
+        previewImgEl.src = '';
+        previewEl.style.display = 'none';
+        placeholderEl.style.display = 'block';
+      }
+    });
+  }
+
+  async function handleFileSelected(file) {
+    if (!file.type.startsWith('image/')) {
+      alert('Mohon pilih file gambar yang valid (WebP, PNG, JPG, SVG, GIF).');
+      return;
+    }
+
+    statusEl.className = 'upload-status-badge loading';
+    statusEl.textContent = 'Mengompresi & mengunggah gambar...';
+    placeholderEl.style.display = 'none';
+    previewEl.style.display = 'block';
+
+    try {
+      const { dataUrl } = await compressImageFile(file);
+      previewImgEl.src = dataUrl;
+
+      // Coba upload ke server jika token admin tersedia
+      const token = STATE.adminToken || sessionStorage.getItem('arra_admin_token') || localStorage.getItem('arra_admin_token');
+      let uploadedUrl = null;
+
+      if (token) {
+        try {
+          const res = await fetch('/api/admin/upload', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              image: dataUrl,
+              filename: file.name,
+              slug: typeof getSlug === 'function' ? getSlug() : 'product'
+            })
+          });
+
+          const data = await res.json();
+          if (data.success && data.url) {
+            uploadedUrl = data.url;
+          }
+        } catch (serverErr) {
+          console.warn('Gagal upload ke server API, fallback ke Data URL:', serverErr);
+        }
+      }
+
+      // Gunakan URL server jika tersedia, atau fallback ke Data URL terkompresi
+      const finalUrl = uploadedUrl || dataUrl;
+      hiddenUrlEl.value = finalUrl;
+      if (manualUrlEl) manualUrlEl.value = finalUrl;
+
+      statusEl.className = 'upload-status-badge';
+      statusEl.textContent = uploadedUrl
+        ? `✅ Gambar tersimpan di server (${uploadedUrl})`
+        : '✅ Gambar siap disimpan (Optimasi selesai)';
+    } catch (err) {
+      statusEl.className = 'upload-status-badge error';
+      statusEl.textContent = 'Gagal memproses gambar: ' + err.message;
+    }
+  }
 }
 
 async function handleAdminSaveProduct(e) {
@@ -1951,6 +2714,8 @@ async function handleAdminSaveProduct(e) {
   btn.disabled = true;
 
   const rawFeatures = document.getElementById('adm_prod_features').value.split('\n').map(f => f.trim()).filter(Boolean);
+  const imageUrlInput = document.getElementById('adm_prod_image_url');
+  const imageUrl = imageUrlInput ? imageUrlInput.value.trim() : '';
 
   const payload = {
     id: currentEditProductId || undefined,
@@ -1962,6 +2727,7 @@ async function handleAdminSaveProduct(e) {
     short_description: document.getElementById('adm_prod_short').value.trim(),
     description: document.getElementById('adm_prod_desc').value.trim(),
     features: rawFeatures,
+    image_url: imageUrl || null,
     asset_reference: document.getElementById('adm_prod_asset').value.trim() || null
   };
 
@@ -2046,6 +2812,40 @@ async function handleAdminSaveOrder(e, orderId) {
     alert(`Gagal memperbarui pesanan: ${err.message}`);
   }
 }
+
+// ============================================================================
+// 6. IMAGE LIGHTBOX MODAL HANDLERS
+// ============================================================================
+window.openImageZoom = function(src, caption) {
+  const modal = document.getElementById('image-lightbox-modal');
+  const img = document.getElementById('lightbox-modal-img');
+  const cap = document.getElementById('lightbox-modal-caption');
+  if (modal && img) {
+    img.src = src;
+    img.alt = caption || 'Pratinjau Gambar Produk';
+    if (cap) cap.textContent = caption || '';
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeImageZoom = function(e) {
+  if (e && e.target && e.target.closest('.lightbox-content') && !e.target.closest('.lightbox-close-btn')) {
+    return;
+  }
+  const modal = document.getElementById('image-lightbox-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    window.closeImageZoom();
+    if (typeof closeOrderModal === 'function') closeOrderModal();
+  }
+});
 
 // ============================================================================
 // 7. INITIALIZATION & GLOBAL LISTENERS

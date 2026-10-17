@@ -275,18 +275,24 @@ function renderProductsTable() {
   const tbody = document.getElementById("products-table-body");
   if (!tbody) return;
 
-  tbody.innerHTML = STATE.products.map(prod => `
-    <tr>
-      <td style="font-size: 1.5rem;">${prod.icon}</td>
-      <td><strong>${prod.name}</strong></td>
-      <td style="font-size: 0.85rem; color: var(--muted);">${prod.description}</td>
-      <td>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="openEditProductModal('${prod.id}')">
-          Edit
-        </button>
-      </td>
-    </tr>
-  `).join("");
+  tbody.innerHTML = STATE.products.map(prod => {
+    const thumbHtml = prod.image_url
+      ? `<img src="${prod.image_url}" alt="${prod.name}" style="width: 64px; height: 38px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); display: block;">`
+      : `<span style="font-size: 1.5rem;">${prod.icon || '📦'}</span>`;
+
+    return `
+      <tr>
+        <td>${thumbHtml}</td>
+        <td><strong>${prod.name}</strong></td>
+        <td style="font-size: 0.85rem; color: var(--muted); max-width: 380px;">${prod.description}</td>
+        <td>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditProductModal('${prod.id}')">
+            Edit
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function renderInquiriesTable() {
@@ -467,6 +473,198 @@ function initModals() {
   if (prodForm) {
     prodForm.addEventListener("submit", handleEditProductSubmit);
   }
+
+  initAdminImageUploader();
+}
+
+/**
+ * Utilitas Kompresi & Upload Gambar di Panel Admin Standalone / GAS
+ */
+function compressAdminImageFile(file, maxWidth = 1280, maxHeight = 720, quality = 0.85) {
+  return new Promise((resolve) => {
+    if (file.type === "image/svg+xml") {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ dataUrl: e.target.result, isOptimized: false });
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let dataUrl;
+        try {
+          dataUrl = canvas.toDataURL("image/webp", quality);
+          if (!dataUrl.startsWith("data:image/webp")) {
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+        } catch (_) {
+          dataUrl = canvas.toDataURL("image/jpeg", quality);
+        }
+
+        resolve({ dataUrl, isOptimized: true, width, height });
+      };
+      img.onerror = () => {
+        resolve({ dataUrl: e.target.result, isOptimized: false });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function initAdminImageUploader() {
+  const dropzoneEl = document.getElementById("edit-prod-dropzone");
+  const fileInputEl = document.getElementById("edit-prod-file");
+  const placeholderEl = document.getElementById("edit-prod-upload-placeholder");
+  const previewEl = document.getElementById("edit-prod-upload-preview");
+  const previewImgEl = document.getElementById("edit-prod-preview-img");
+  const statusEl = document.getElementById("edit-prod-upload-status");
+  const hiddenUrlEl = document.getElementById("edit-prod-image");
+  const manualUrlEl = document.getElementById("edit-prod-manual-url");
+  const browseBtnEl = document.getElementById("btn-admin-browse-image");
+  const changeBtnEl = document.getElementById("btn-admin-change-image");
+  const removeBtnEl = document.getElementById("btn-admin-remove-image");
+
+  if (!dropzoneEl || !fileInputEl) return;
+
+  const triggerBrowse = () => fileInputEl.click();
+  if (browseBtnEl) browseBtnEl.addEventListener("click", (e) => { e.stopPropagation(); triggerBrowse(); });
+  if (changeBtnEl) changeBtnEl.addEventListener("click", (e) => { e.stopPropagation(); triggerBrowse(); });
+
+  dropzoneEl.addEventListener("click", (e) => {
+    if (e.target.closest("#btn-admin-remove-image") || e.target.closest("#btn-admin-change-image")) return;
+    if (!hiddenUrlEl.value) triggerBrowse();
+  });
+
+  ["dragenter", "dragover"].forEach(eventName => {
+    dropzoneEl.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneEl.classList.add("dragover");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(eventName => {
+    dropzoneEl.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneEl.classList.remove("dragover");
+    });
+  });
+
+  dropzoneEl.addEventListener("drop", (e) => {
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleAdminFileSelected(files[0]);
+    }
+  });
+
+  fileInputEl.addEventListener("change", () => {
+    if (fileInputEl.files && fileInputEl.files.length > 0) {
+      handleAdminFileSelected(fileInputEl.files[0]);
+    }
+  });
+
+  if (removeBtnEl) {
+    removeBtnEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hiddenUrlEl.value = "";
+      if (manualUrlEl) manualUrlEl.value = "";
+      fileInputEl.value = "";
+      previewImgEl.src = "";
+      previewEl.style.display = "none";
+      placeholderEl.style.display = "block";
+      statusEl.className = "upload-status-badge";
+      statusEl.textContent = "Gambar telah dihapus.";
+    });
+  }
+
+  if (manualUrlEl) {
+    manualUrlEl.addEventListener("input", () => {
+      const val = manualUrlEl.value.trim();
+      hiddenUrlEl.value = val;
+      if (val) {
+        previewImgEl.src = val;
+        placeholderEl.style.display = "none";
+        previewEl.style.display = "block";
+        statusEl.className = "upload-status-badge";
+        statusEl.textContent = "Menggunakan URL manual.";
+      } else {
+        previewImgEl.src = "";
+        previewEl.style.display = "none";
+        placeholderEl.style.display = "block";
+      }
+    });
+  }
+
+  async function handleAdminFileSelected(file) {
+    if (!file.type.startsWith("image/")) {
+      alert("Mohon pilih file gambar yang valid (WebP, PNG, JPG, SVG, GIF).");
+      return;
+    }
+
+    statusEl.className = "upload-status-badge loading";
+    statusEl.textContent = "Mengompresi & mengunggah gambar...";
+    placeholderEl.style.display = "none";
+    previewEl.style.display = "block";
+
+    try {
+      const { dataUrl } = await compressAdminImageFile(file);
+      previewImgEl.src = dataUrl;
+
+      let uploadedUrl = null;
+      const token = STATE.token || sessionStorage.getItem("arra_admin_token");
+      if (token) {
+        try {
+          const res = await fetch("/api/admin/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              image: dataUrl,
+              filename: file.name,
+              slug: (document.getElementById("edit-prod-name")?.value || "product").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+            })
+          });
+          const resData = await res.json();
+          if (resData.success && resData.url) {
+            uploadedUrl = resData.url;
+          }
+        } catch (_) {}
+      }
+
+      const finalUrl = uploadedUrl || dataUrl;
+      hiddenUrlEl.value = finalUrl;
+      if (manualUrlEl) manualUrlEl.value = finalUrl;
+
+      statusEl.className = "upload-status-badge";
+      statusEl.textContent = uploadedUrl
+        ? `✅ Gambar tersimpan di server (${uploadedUrl})`
+        : "✅ Gambar siap disimpan (Optimasi selesai)";
+    } catch (err) {
+      statusEl.className = "upload-status-badge error";
+      statusEl.textContent = "Gagal memproses gambar: " + err.message;
+    }
+  }
 }
 
 window.openEditPackageModal = function(pkgId) {
@@ -539,6 +737,35 @@ window.openEditProductModal = function(prodId) {
   document.getElementById("edit-prod-name").value = prod.name;
   document.getElementById("edit-prod-desc").value = prod.description;
 
+  const hiddenImgInput = document.getElementById("edit-prod-image");
+  const manualUrlInput = document.getElementById("edit-prod-manual-url");
+  const previewImgEl = document.getElementById("edit-prod-preview-img");
+  const placeholderEl = document.getElementById("edit-prod-upload-placeholder");
+  const previewEl = document.getElementById("edit-prod-upload-preview");
+  const statusEl = document.getElementById("edit-prod-upload-status");
+
+  const currentImg = prod.image_url || "";
+  if (hiddenImgInput) hiddenImgInput.value = currentImg;
+  if (manualUrlInput) manualUrlInput.value = currentImg;
+
+  if (currentImg && previewImgEl && previewEl && placeholderEl) {
+    previewImgEl.src = currentImg;
+    placeholderEl.style.display = "none";
+    previewEl.style.display = "block";
+    if (statusEl) {
+      statusEl.className = "upload-status-badge";
+      statusEl.textContent = "✅ Sampul produk aktif";
+    }
+  } else if (previewEl && placeholderEl) {
+    if (previewImgEl) previewImgEl.src = "";
+    previewEl.style.display = "none";
+    placeholderEl.style.display = "block";
+    if (statusEl) {
+      statusEl.className = "upload-status-badge";
+      statusEl.textContent = "";
+    }
+  }
+
   openModal("modal-edit-product");
 };
 
@@ -548,10 +775,12 @@ async function handleEditProductSubmit(e) {
   const icon = document.getElementById("edit-prod-icon").value.trim();
   const name = document.getElementById("edit-prod-name").value.trim();
   const description = document.getElementById("edit-prod-desc").value.trim();
+  const imgInput = document.getElementById("edit-prod-image");
+  const image_url = imgInput ? imgInput.value.trim() : "";
 
   const prodIndex = STATE.products.findIndex(p => p.id === id);
   if (prodIndex >= 0) {
-    const updatedProd = { ...STATE.products[prodIndex], icon, name, description };
+    const updatedProd = { ...STATE.products[prodIndex], icon, name, description, image_url };
     STATE.products[prodIndex] = updatedProd;
     saveCustomConfigToLocalStorage();
     renderProductsTable();
@@ -562,7 +791,7 @@ async function handleEditProductSubmit(e) {
         await fetch(STATE.gasUrl, {
           method: "POST",
           body: JSON.stringify({
-            action: "updateProduct",
+            action: "saveProduct",
             token: STATE.token,
             product: updatedProd
           })
@@ -573,7 +802,7 @@ async function handleEditProductSubmit(e) {
     }
 
     closeModal("modal-edit-product");
-    showGlobalAlert(`Produk "${name}" berhasil diperbarui!`, "success");
+    showGlobalAlert(`Produk "${name}" berhasil diperbarui dengan foto sampul!`, "success");
   }
 }
 
