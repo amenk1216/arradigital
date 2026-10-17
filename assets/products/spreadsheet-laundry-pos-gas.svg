@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <linearGradient id="pos-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a192f"/>
+      <stop offset="50%" stop-color="#0e2a3f"/>
+      <stop offset="100%" stop-color="#071e22"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#pos-bg)"/>
+  <circle cx="280" cy="220" r="180" fill="#0ea5e9" fill-opacity="0.12"/>
+  <circle cx="980" cy="460" r="200" fill="#10b981" fill-opacity="0.12"/>
+  
+  <text x="640" y="85" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">
+    SPREADSHEET KASIR LAUNDRY + BOT WHATSAPP
+  </text>
+  <text x="640" y="125" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" fill="#7dd3fc" letter-spacing="0.5">
+    Sistem POS Google Sheets, Cetak Struk PDF Otomatis, &amp; Auto-Notif WhatsApp Tanpa Server
+  </text>
+
+  <!-- POS App Mockup -->
+  <g transform="translate(190, 160)">
+    <rect x="0" y="0" width="900" height="390" rx="16" fill="#0c202d" stroke="#0ea5e9" stroke-width="2"/>
+    <rect x="0" y="0" width="900" height="44" rx="16" fill="#143144"/>
+    <circle cx="25" cy="22" r="6" fill="#ef4444"/>
+    <circle cx="45" cy="22" r="6" fill="#f59e0b"/>
+    <circle cx="65" cy="22" r="6" fill="#10b981"/>
+    <text x="100" y="27" font-family="sans-serif" font-size="13" font-weight="700" fill="#e0f2fe">🧺 Laundry POS Suite &middot; Google Apps Script Engine</text>
+
+    <!-- Kasir Input Panel -->
+    <rect x="30" y="70" width="400" height="290" rx="10" fill="#081822" stroke="#1d445c"/>
+    <text x="50" y="102" font-family="sans-serif" font-size="14" font-weight="800" fill="#38bdf8">📝 Input Order Masuk</text>
+    <rect x="50" y="120" width="360" height="32" rx="6" fill="#0f2b3c"/>
+    <text x="64" y="141" font-family="sans-serif" font-size="12" fill="#94a3b8">Pelanggan: Ibu Rina (0812-9876-xxxx)</text>
+    <rect x="50" y="165" width="360" height="32" rx="6" fill="#0f2b3c"/>
+    <text x="64" y="186" font-family="sans-serif" font-size="12" fill="#94a3b8">Layanan: Cuci Komplit Kilat (4 Kg)</text>
+    <rect x="50" y="210" width="360" height="40" rx="6" fill="#0369a1"/>
+    <text x="230" y="235" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="800" fill="#ffffff">Simpan Order &amp; Cetak PDF (Rp 36.000)</text>
+
+    <!-- Struk Nota & WhatsApp Preview -->
+    <rect x="470" y="70" width="400" height="290" rx="10" fill="#081822" stroke="#1d445c"/>
+    <text x="490" y="102" font-family="sans-serif" font-size="14" font-weight="800" fill="#4ade80">📲 WhatsApp Bot Auto-Notification</text>
+    <rect x="490" y="125" width="360" height="135" rx="8" fill="#0d2e24" stroke="#10b981" stroke-width="1.2"/>
+    <text x="508" y="152" font-family="sans-serif" font-size="12" font-weight="700" fill="#86efac">Pesan Terkirim Otomatis:</text>
+    <text x="508" y="174" font-family="sans-serif" font-size="11" fill="#ecfdf5">"Halo Bu Rina, cucian Anda #LND-902 sudah</text>
+    <text x="508" y="194" font-family="sans-serif" font-size="11" fill="#ecfdf5">SELESAI dan wangi. Siap diambil/diantar.</text>
+    <text x="508" y="214" font-family="sans-serif" font-size="11" fill="#67e8f9">Unduh Struk: https://arradigital.my.id/nota/..."</text>
+    <rect x="490" y="275" width="360" height="32" rx="6" fill="#059669"/>
+    <text x="670" y="296" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">Status: Notifikasi Terkirim ✓</text>
+  </g>
+
+  <!-- Bottom Badges -->
+  <g transform="translate(190, 585)">
+    <rect x="0" y="0" width="210" height="56" rx="10" fill="#0b2434" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="25" y="33" font-size="14">⚡</text>
+    <text x="48" y="26" font-family="sans-serif" font-size="13" font-weight="700" fill="#ffffff">Otomatisasi Penuh</text>
+    <text x="48" y="44" font-family="sans-serif" font-size="11" fill="#7dd3fc">Cucian Masuk s/d Ambil</text>
+
+    <rect x="230" y="0" width="210" height="56" rx="10" fill="#0b2434" stroke="#10b981" stroke-width="1.5"/>
+    <text x="255" y="33" font-size="14">💰</text>
+    <text x="278" y="26" font-family="sans-serif" font-size="13" font-weight="700" fill="#ffffff">Rp 0 Langganan</text>
+    <text x="278" y="44" font-family="sans-serif" font-size="11" fill="#7dd3fc">Hemat Biaya Software POS</text>
+
+    <rect x="460" y="0" width="210" height="56" rx="10" fill="#0b2434" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="485" y="33" font-size="14">🧾</text>
+    <text x="508" y="26" font-family="sans-serif" font-size="13" font-weight="700" fill="#ffffff">Cetak Struk PDF</text>
+    <text x="508" y="44" font-family="sans-serif" font-size="11" fill="#7dd3fc">Format Kasir Siap Print</text>
+
+    <rect x="690" y="0" width="210" height="56" rx="10" fill="#0b2434" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="715" y="33" font-size="14">📲</text>
+    <text x="738" y="26" font-family="sans-serif" font-size="13" font-weight="700" fill="#ffffff">WhatsApp Notif</text>
+    <text x="738" y="44" font-family="sans-serif" font-size="11" fill="#7dd3fc">Pelanggan Senang &amp; Loyal</text>
+  </g>
+</svg>
