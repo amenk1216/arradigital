@@ -7,6 +7,15 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('arra_theme');
+        const theme = saved || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body class="admin-body">
 
@@ -15,6 +24,12 @@
   <!-- ========================================== -->
   <div id="view-login" class="login-wrapper">
     <div class="login-card">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">
+        <button type="button" class="theme-toggle-btn admin-theme-toggle" aria-label="Ganti tema tampilan" title="Ganti Mode Terang / Gelap">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
       <div class="login-header">
         <a href="index.html" class="brand-logo">
           Arra<span class="logo-accent">Digital</span>
@@ -33,7 +48,6 @@
         <div class="form-group">
           <label class="form-label" for="login-password">Password</label>
           <input type="password" id="login-password" class="form-input" placeholder="Masukkan password" required autocomplete="current-password">
-          <p class="form-hint">Kredensial awal default: <strong>admin</strong> / <strong>admin123</strong></p>
         </div>
 
         <button type="submit" id="btn-submit-login" class="btn btn-primary btn-full" style="margin-top: 10px;">
@@ -62,6 +76,11 @@
         </div>
 
         <div class="admin-nav-right">
+          <!-- Theme Switcher in Admin -->
+          <button type="button" class="theme-toggle-btn admin-theme-toggle" aria-label="Ganti mode tema" title="Ganti Mode Terang / Gelap">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+
           <div id="gas-status-indicator" class="gas-status-pill" title="Status koneksi ke Google Spreadsheet">
             <span class="status-dot standalone"></span>
             <span id="gas-status-text">Mode Standalone</span>

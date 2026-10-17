@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/33463896/README.md)
 # ARRA DIGITAL - Solusi Digital Cerdas & Tools AI Indonesia
 
 Website resmi produksi **ARRA DIGITAL** (`arradigital.my.id`). Dibangun dengan arsitektur **Serverless Static Frontend + Google Apps Script (GAS) Database via Google Sheets**, di-host di **GitHub** dan di-deploy menggunakan **Vercel** dengan domain kustom `arradigital.my.id`.
@@ -122,9 +121,10 @@ git push -u origin main
 Panel Admin dapat diakses langsung melalui:
 - URL: `https://arradigital.my.id/admin` atau link **"Admin"** di navbar dan footer.
 
-### Kredensial Login Bawaan:
-- **Username:** `admin`
-- **Password:** `admin123` (atau `ArraSecure2026!Admin`)
+### Kredensial Login Administrator:
+- Username dan Password diatur secara aman melalui file konfigurasi lingkungan (`.env` atau Environment Variables server/Vercel).
+- **Default Username:** `admin` (Dapat disesuaikan di `ADMIN_USERNAME` pada `.env`)
+- **Password:** Dikonfigurasikan melalui variabel `ADMIN_PASSWORD` pada `.env` demi keamanan server.
 
 ### Menghubungkan Google Apps Script di Admin Panel:
 1. Setelah login ke Dashboard, klik tab **Pengaturan**.
