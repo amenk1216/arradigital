@@ -198,10 +198,10 @@
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Ikon</th>
+                    <th style="width: 80px;">Pratinjau</th>
                     <th>Nama Produk</th>
                     <th>Deskripsi</th>
-                    <th>Aksi</th>
+                    <th style="width: 100px;">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="products-table-body">
@@ -379,6 +379,48 @@
           <div class="form-group">
             <label class="form-label" for="edit-prod-desc">Deskripsi</label>
             <textarea id="edit-prod-desc" class="form-textarea" rows="3" required></textarea>
+          </div>
+
+          <!-- Upload Foto / Sampul Produk -->
+          <div class="form-group">
+            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Foto / Sampul Produk Dipasarkan</span>
+              <span style="font-size: 0.78rem; color: var(--muted);">Format: WebP, PNG, JPG, SVG</span>
+            </label>
+
+            <input type="file" id="edit-prod-file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" style="display: none;">
+
+            <div id="edit-prod-dropzone" class="product-upload-dropzone">
+              <div id="edit-prod-upload-placeholder">
+                <div class="upload-icon">📸</div>
+                <div class="upload-title">
+                  Tarik &amp; lepas gambar ke sini, atau 
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-browse-image" style="margin-left: 4px;">Pilih File</button>
+                </div>
+                <div class="upload-subtitle">Gambar langsung dioptimasi otomatis untuk tampilan website berkecepatan tinggi.</div>
+              </div>
+
+              <div id="edit-prod-upload-preview" style="display: none;">
+                <div class="upload-preview-wrapper">
+                  <img id="edit-prod-preview-img" src="" alt="Pratinjau Sampul Produk">
+                  <div class="upload-preview-overlay">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-change-image">Ganti Foto</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="btn-admin-remove-image">Hapus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="edit-prod-upload-status" class="upload-status-badge"></div>
+
+            <input type="hidden" id="edit-prod-image">
+
+            <details style="margin-top: 8px; font-size: 0.82rem; color: var(--muted);">
+              <summary style="cursor: pointer; user-select: none;">Gunakan URL / Path manual (Opsional)</summary>
+              <div style="margin-top: 6px;">
+                <input type="text" id="edit-prod-manual-url" class="form-input" style="font-size: 0.85rem;" placeholder="/assets/products/nama-file.jpg atau link URL gambar">
+              </div>
+            </details>
           </div>
         </div>
         <div class="modal-footer">
